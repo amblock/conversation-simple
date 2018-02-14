@@ -1,3 +1,36 @@
+# Fork Details
+This is a fork of the [Conversation Simple demo application]( https://github.com/watson-developer-cloud/conversation-simple) that allows a user to specify and choose between multiple WCS instances and workspaces.
+
+The application will automatically retrieve all workspaces for the instances that are specified in the configuration.
+
+**Note: This application will not use VCAP bound services.**
+
+### Fork Specific Instructions
+
+#### Set the credentials in config.js
+1. Set wcsCredentials by mapping a unique identifying name for each WCS instance to the credentials for that instance. You may specify as many instances as you like.
+    ```javascript
+    var wcsCredentials = {
+      "Credentials 1": {
+        'url': '',
+        'username': '',
+        'password': ''
+      },
+      'Credentials 2': {
+        'url': '',
+        'username': '',
+        'password': ''
+      },
+    ```
+1. Optionally set basicAuthConfig to set up basic authentication for your application. Instructions for configuration can be found in the [documentation for the express-basic-auth  package](https://www.npmjs.com/package/express-basic-auth).
+    ```javascript
+    var basicAuthConfig = {
+      users: { 'username': 'password' },
+      challenge: true
+    };
+    ```
+
+
 # Conversation Sample Application [![Build Status](https://travis-ci.org/watson-developer-cloud/conversation-simple.svg?branch=master)](http://travis-ci.org/watson-developer-cloud/conversation-simple) [![codecov.io](https://codecov.io/github/watson-developer-cloud/conversation-simple/coverage.svg?branch=master)](https://codecov.io/github/watson-developer-cloud/conversation-simple?branch=master)
 
 This Node.js app demonstrates the Conversation service in a simple chat interface simulating a cognitive car dashboard.
@@ -24,56 +57,56 @@ If you want to modify the app or use it as a basis for building your own app, in
 
 Use GitHub to clone the repository locally, or [download the .zip file](https://github.com/watson-developer-cloud/conversation-simple/archive/master.zip) of the repository and extract the files.
 
-### Setting up the Conversation service
+### ~~Setting up the Conversation service~~
 
-You can use an exisiting instance of the Conversation service. Otherwise, follow these steps.
+~~You can use an exisiting instance of the Conversation service. Otherwise, follow these steps.~~
 
-1. At the command line, go to the local project directory (`conversation-simple`).
+1. ~~At the command line, go to the local project directory (`conversation-simple`).~~
 
-1. Connect to Bluemix with the Cloud Foundry command-line tool. For more information, see the Watson Developer Cloud [documentation][cf_docs].
+1. ~~Connect to Bluemix with the Cloud Foundry command-line tool. For more information, see the Watson Developer Cloud [documentation][cf_docs].~~
     ```bash
     cf login
     ```
 
-1. Create an instance of the Conversation service in Bluemix. For example:
+1. ~~Create an instance of the Conversation service in Bluemix. For example:~~
 
     ```bash
     cf create-service conversation free my-conversation-service
     ```
 
-### Importing the Conversation workspace
+### ~~Importing the Conversation workspace~~
 
-1. In your browser, navigate to [your Bluemix console] (https://console.ng.bluemix.net/dashboard/services).
+1. ~~In your browser, navigate to [your Bluemix console] (https://console.ng.bluemix.net/dashboard/services).~~
 
-1. From the **All Items** tab, click the newly created Conversation service in the **Services** list.
+1. ~~From the **All Items** tab, click the newly created Conversation service in the **Services** list.~~
 
     ![Screen capture of Services list](readme_images/conversation_service.png)
 
-1. On the Service Details page, click **Launch tool**.
+1. ~~On the Service Details page, click **Launch tool**.~~
 
-1. Click the **Import workspace** icon in the Conversation service tool. Specify the location of the workspace JSON file in your local copy of the app project:
+1. ~~Click the **Import workspace** icon in the Conversation service tool. Specify the location of the workspace JSON file in your local copy of the app project:~~
 
     `<project_root>/training/car_workspace.json`
 
-1. Select **Everything (Intents, Entities, and Dialog)** and then click **Import**. The car dashboard workspace is created.
+1. ~~Select **Everything (Intents, Entities, and Dialog)** and then click **Import**. The car dashboard workspace is created.~~
 
-### Configuring the app environment
+### ~~Configuring the app environment~~
 
-1. Copy or rename the `.env.example` file to `.env` (nothing before the dot).
+1. ~~Copy or rename the `.env.example` file to `.env` (nothing before the dot).~~
 
-1. Create a service key in the format `cf create-service-key <service_instance> <service_key>`. For example:
+1. ~~Create a service key in the format `cf create-service-key <service_instance> <service_key>`. For example:~~
 
     ```bash
     cf create-service-key my-conversation-service myKey
     ```
 
-1. Retrieve the credentials from the service key using the command `cf service-key <service_instance> <service_key>`. For example:
+1. ~~Retrieve the credentials from the service key using the command `cf service-key <service_instance> <service_key>`. For example:~~
 
     ```bash
     cf service-key my-conversation-service myKey
     ```
 
-   The output from this command is a JSON object, as in this example:
+   ~~The output from this command is a JSON object, as in this example:~~
 
     ```JSON
     {
@@ -83,22 +116,22 @@ You can use an exisiting instance of the Conversation service. Otherwise, follow
     }
     ```
 
-1. Paste  the `password` and `username` values (without quotation marks) from the JSON into the `CONVERSATION_PASSWORD` and `CONVERSATION_USERNAME` variables in the `.env` file. For example:
+1. ~~Paste  the `password` and `username` values (without quotation marks) from the JSON into the `CONVERSATION_PASSWORD` and `CONVERSATION_USERNAME` variables in the `.env` file. For example:~~
 
     ```
     CONVERSATION_USERNAME=ca2905e6-7b5d-4408-9192-e4d54d83e604
     CONVERSATION_PASSWORD=87iT7aqpvU7l
     ```
 
-1. In your Bluemix console, open the Conversation service instance where you imported the workspace.
+1. ~~In your Bluemix console, open the Conversation service instance where you imported the workspace.~~
 
-1. Click the menu icon in the upper-right corner of the workspace tile, and then select **View details**.
+1. ~~Click the menu icon in the upper-right corner of the workspace tile, and then select **View details**.~~
 
     ![Screen capture of workspace tile menu](readme_images/workspace_details.png)
 
-1. Click the ![Copy](readme_images/copy_icon.png) icon to copy the workspace ID to the clipboard.
+1. ~~Click the ![Copy](readme_images/copy_icon.png) icon to copy the workspace ID to the clipboard.~~
 
-1. On the local system, paste the workspace ID into the WORKSPACE_ID variable in the `.env` file. Save and close the file.
+1. ~~On the local system, paste the workspace ID into the WORKSPACE_ID variable in the `.env` file. Save and close the file.~~
 
 ### Installing and starting the app
 
@@ -116,11 +149,11 @@ You can use an exisiting instance of the Conversation service. Otherwise, follow
 
 1. Point your browser to http://localhost:3000 to try out the app.
 
-## Testing the app
+## ~~Testing the app~~
 
-After your app is installed and running, experiment with it to see how it responds.
+~~After your app is installed and running, experiment with it to see how it responds.~~
 
-The chat interface is on the left, and the JSON that the JavaScript code receives from the Conversation service is on the right. Your questions and commands are interpreted using a small set of sample data trained with the following intents:
+~~The chat interface is on the left, and the JSON that the JavaScript code receives from the Conversation service is on the right. Your questions and commands are interpreted using a small set of sample data trained with the following intents:~~
 
     turn_on
     turn_off
@@ -134,13 +167,13 @@ The chat interface is on the left, and the JSON that the JavaScript code receive
     greetings
     goodbyes
 
-Type a request, such as `music on` or `I want to turn on the windshield wipers`. The system understands your intent and responds. You can see the details of how your input was understood by examining the JSON data in the `Watson understands` section on the right side.
+~~Type a request, such as `music on` or `I want to turn on the windshield wipers`. The system understands your intent and responds. You can see the details of how your input was understood by examining the JSON data in the `Watson understands` section on the right side.~~
 
-For example, if you type `Turn on some music`, the JSON data shows that the system understood the `turn_on` intent with a high level of confidence, along with the `appliance` entity with a value of `music`.
+~~For example, if you type `Turn on some music`, the JSON data shows that the system understood the `turn_on` intent with a high level of confidence, along with the `appliance` entity with a value of `music`.~~
 
-For more information about intents, see the [Conversation service documentation][doc_intents].
+~~For more information about intents, see the [Conversation service documentation][doc_intents].~~
 
-To see details of how these intents are defined, including sample input for each intent, launch the Conversation tool.
+~~To see details of how these intents are defined, including sample input for each intent, launch the Conversation tool.~~
 
 ## Modifying the app
 
@@ -157,7 +190,7 @@ You can use Cloud Foundry to deploy your local version of the app to Bluemix.
 1. In the project root directory, open the `manifest.yml` file:
 
   * In the `applications` section of the `manifest.yml` file, change the `name` value to a unique name for your version of the demo app.
-  * In the `services` section, specify the name of the Conversation service instance you created for the demo app. If you do not remember the service name, use the `cf services` command to list all services you have created.
+  * ~~In the `services` section, specify the name of the Conversation service instance you created for the demo app. If you do not remember the service name, use the `cf services` command to list all services you have created.~~
 
   The following example shows a modified `manifest.yml` file:
 
