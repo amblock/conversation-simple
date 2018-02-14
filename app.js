@@ -19,38 +19,83 @@
 var express = require('express'); // app server
 var bodyParser = require('body-parser'); // parser for post requests
 var Conversation = require('watson-developer-cloud/conversation/v1'); // watson sdk
+var basicAuth = require('express-basic-auth'); // authentication
+
+var config = require('./config');
 
 var app = express();
+
+app.use(basicAuth(config.basicAuthConfig));
 
 // Bootstrap application settings
 app.use(express.static('./public')); // load UI from public folder
 app.use(bodyParser.json());
 
-// Create the service wrapper
-var conversation = new Conversation({
-  // If unspecified here, the CONVERSATION_USERNAME and CONVERSATION_PASSWORD env properties will be checked
-  // After that, the SDK will fall back to the bluemix-provided VCAP_SERVICES environment property
-  //'username': process.env.CONVERSATION_USERNAME,
-  //'password': process.env.CONVERSATION_PASSWORD,
-  'version_date': '2017-05-26'
+// Load all wcs credentials
+var wcsCredentials = config.wcsCredentials;
+
+var conversationServices = {};
+Object.keys(wcsCredentials).forEach(function(key) {
+  var currentCredentials = wcsCredentials[key];
+  conversationServices[key] = new Conversation({
+    'username': currentCredentials['username'],
+    'password': currentCredentials['password'],
+    'version_date': '2017-05-26'
+  });
+});
+
+function getWorkspaces(conversationService) {
+  return new Promise(function(resolve, reject) {
+    conversationService.listWorkspaces(function(err, response) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(response.workspaces);
+      }
+    });
+  });
+}
+
+// Endpoint to be call from the client side
+app.get('/api/workspaces', function(req, res) {
+  var workspacePromises = Object.keys(conversationServices).map(function(key){
+    var currentService = conversationServices[key];
+    return getWorkspaces(currentService)
+        .then(function(workspaces){
+          return {
+            workspaces: workspaces,
+            instance: key
+          };
+        });
+  });
+
+  Promise.all(workspacePromises)
+    .then(function(workspaceData){
+      res.json({
+        data: {
+          'instances': workspaceData
+        }
+      });
+    })
+    .catch(function(err){
+      res.status(500).send(err);
+    });
+
 });
 
 // Endpoint to be call from the client side
 app.post('/api/message', function(req, res) {
-  var workspace = process.env.WORKSPACE_ID || '<workspace-id>';
-  if (!workspace || workspace === '<workspace-id>') {
-    return res.json({
-      'output': {
-        'text': 'The app has not been configured with a <b>WORKSPACE_ID</b> environment variable. Please refer to the ' + '<a href="https://github.com/watson-developer-cloud/conversation-simple">README</a> documentation on how to set this variable. <br>' + 'Once a workspace has been defined the intents may be imported from ' + '<a href="https://github.com/watson-developer-cloud/conversation-simple/blob/master/training/car_workspace.json">here</a> in order to get a working application.'
-      }
-    });
-  }
+  var instance = req.body.instance;
+  var workspace = req.body.workspace;
+
   var payload = {
     workspace_id: workspace,
     context: req.body.context || {},
-    input: req.body.input || {}
+    input: req.body.input || {},
+    alternate_intents:true
   };
 
+  var conversation = conversationServices[instance];
   // Send the input to the conversation service
   conversation.message(payload, function(err, data) {
     if (err) {

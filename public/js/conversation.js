@@ -17,16 +17,22 @@ var ConversationPanel = (function() {
     }
   };
 
+  var workspaceData;
+
   // Publicly accessible methods defined
   return {
     init: init,
-    inputKeyDown: inputKeyDown
+    inputKeyDown: inputKeyDown,
+    onInstanceSelected: onInstanceSelected
   };
 
   // Initialize the module
   function init() {
     chatUpdateSetup();
+
     Api.sendRequest( '', null );
+    Api.getWorkspaces();
+
     setupInputBox();
   }
   // Set up callbacks on payload setters in Api module
@@ -43,6 +49,49 @@ var ConversationPanel = (function() {
       currentResponsePayloadSetter.call(Api, newPayloadStr);
       displayMessage(JSON.parse(newPayloadStr), settings.authorTypes.watson);
     };
+
+    var currentWorkspaceResponsePayloadSetter = Api.setWorkspaceResponsePayload;
+    Api.setWorkspaceResponsePayload = function(newPayloadStr) {
+      currentWorkspaceResponsePayloadSetter.call(Api, newPayloadStr);
+      ConversationPanel.workspaceData = JSON.parse(newPayloadStr).data.instances;
+      setupInstanceDropdown();
+    };
+  }
+
+  function setupInstanceDropdown(){
+    var instanceDropdown = document.getElementById('instance-selector');
+    ConversationPanel.workspaceData.forEach(function(instanceData){
+      var option = document.createElement('option');
+      option.text = instanceData.instance;
+      option.value = instanceData.instance;
+      instanceDropdown.appendChild(option);
+    });
+
+    onInstanceSelected();
+  }
+
+  function onInstanceSelected(){
+    var instanceDropdown = document.getElementById('instance-selector');
+    var workspaceDropdown = document.getElementById('workspace-selector');
+
+    var selectedInstance = instanceDropdown.value;
+
+    var workspaceIndex = ConversationPanel.workspaceData.map(function(e) { return e.instance; }).indexOf(selectedInstance);
+    var workspaces = ConversationPanel.workspaceData[workspaceIndex].workspaces;
+
+    // clear current options
+    var length = workspaceDropdown.options.length;
+    while (workspaceDropdown.options.length > 0) {
+      workspaceDropdown.remove(0);
+    }
+
+    // set new options
+    workspaces.forEach(function(workspaceData){
+      var option = document.createElement('option');
+      option.text = workspaceData.name;
+      option.value = workspaceData.workspace_id;
+      workspaceDropdown.appendChild(option);
+    });
   }
 
 // Set up the input box to underline text as it is typed
@@ -208,6 +257,9 @@ var ConversationPanel = (function() {
 
   // Handles the submission of input
   function inputKeyDown(event, inputBox) {
+    var instance = document.getElementById('instance-selector').value;
+    var workspace = document.getElementById('workspace-selector').value;
+
     // Submit on enter key, dis-allowing blank messages
     if (event.keyCode === 13 && inputBox.value) {
       // Retrieve the context from the previous server response
@@ -218,7 +270,7 @@ var ConversationPanel = (function() {
       }
 
       // Send the user message
-      Api.sendRequest(inputBox.value, context);
+      Api.sendRequest(inputBox.value, context, instance, workspace);
 
       // Clear input box for further messages
       inputBox.value = '';

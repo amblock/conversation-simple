@@ -80,7 +80,7 @@ div {
   margin: 0.75rem;
   overflow-y: auto;
   overflow-x: hidden;
-  height: calc(100% - 4rem);
+  height: calc(100% - 4rem - 120px);
 }
 
 .message-inner {
@@ -308,6 +308,17 @@ pre {
 
 html{
   font-size: 16px;
+}
+
+.workspace-selector {
+    height: 120px;
+    display:flex;
+    flex-direction:column;
+}
+
+.workspace-selector select {
+    width: 200px;
+    margin: 10px;
 }
 
 @media only screen and (max-width: 1000px) {
