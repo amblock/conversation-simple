@@ -25,7 +25,9 @@ var config = require('./config');
 
 var app = express();
 
-app.use(basicAuth(config.basicAuthConfig));
+if (Object.keys(config.basicAuthConfig).length != 0){
+  app.use(basicAuth(config.basicAuthConfig));
+}
 
 // Bootstrap application settings
 app.use(express.static('./public')); // load UI from public folder
