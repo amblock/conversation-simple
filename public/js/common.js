@@ -29,7 +29,8 @@ var Common = (function() {
 
     // Fill the "content" of the element
     if (domJson.text) {
-      element.innerHTML = domJson.text;
+      element.innerText = domJson.text;
+      // element.innerHTML = domJson.text;
     } else if (domJson.html) {
       element.insertAdjacentHTML('beforeend', domJson.html);
     }
